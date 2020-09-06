@@ -37,3 +37,10 @@ jobs:
       run: |
         go test -v -coverprofile spartan.out . 
         go tool cover -html=spartan.out
+        
+    - name: Run vet & lint
+      run: |
+        go vet .
+        golint .
+
+
