@@ -25,6 +25,7 @@ jobs:
     - name: Get dependencies
       run: |
         go get -v -t -d ./...
+        go get -u golang.org/x/lint/golint
         if [ -f Gopkg.toml ]; then
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
@@ -37,7 +38,7 @@ jobs:
       run: |
         go test -v -coverprofile spartan.out . 
         go tool cover -html=spartan.out
-        
+
     - name: Run vet & lint
       run: |
         go vet .
