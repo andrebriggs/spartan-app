@@ -4,9 +4,16 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/go
 
 trigger:
-- master
-- DEPLOY/*
-- deploy/*
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - .github
+
+# - master
+# - DEPLOY/*
+# - deploy/*
 
 # Don't run against PRs
 pr: none

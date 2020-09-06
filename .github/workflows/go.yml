@@ -34,4 +34,6 @@ jobs:
       run: go build -v .
 
     - name: Test
-      run: go test -v .
+      run: |
+        go test -v -coverprofile spartan.out . 
+        go tool cover -html=spartan.out
