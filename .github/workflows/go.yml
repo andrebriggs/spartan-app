@@ -6,12 +6,12 @@ on:
   pull_request:
     branches: [ master ]
 
-# env:
+env:
   # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   # AWS_REGION: us-east-1
   # APP_NAME: spartan-app
-  # DOCKER_REPO: andrebriggs
+  DOCKER_REPO: andrebriggs
   # DOCKER_PASSWORD: ${{ secrets.ACR_PASSWORD }}
   # NUGET_PASSWORD: ${{ secrets.PACKAGES_PAT }}
   # NUGET_SOURCE: https://nuget.pkg.github.com/pharos/index.json
@@ -27,23 +27,23 @@ jobs:
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
       with:
-        go-version: ^1.13
+        go-version: ^1.15
       id: go
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
 
-    - name: Get dependencies
-      run: |
-        go get -v -t -d ./...
-        go get -u golang.org/x/lint/golint
-        if [ -f Gopkg.toml ]; then
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep ensure
-        fi
+    # - name: Get dependencies
+    #   run: |
+    #     go get -v -t -d ./...
+    #     go get -u golang.org/x/lint/golint
+    #     if [ -f Gopkg.toml ]; then
+    #         curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+    #         dep ensure
+    #     fi
 
-    - name: Build
-      run: go build -v .
+    # - name: Build
+    #   run: go build -v .
 
     - name: Test
       run: |
@@ -66,8 +66,8 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
       with:
         inlineScript: |
-          echo "az acr build -r andrebriggs --image $GITHUB_REPOSITORY:$(date +%s) ."
-          az acr build -r andrebriggs --image $GITHUB_REPOSITORY:$(date +%s) .
+          echo "az acr build -r $DOCKER_REPO --image $GITHUB_REPOSITORY:$(date +%s) ."
+          az acr build -r $DOCKER_REPO --image $GITHUB_REPOSITORY:$(date +%s) .
 
 
     # - name: Login to ACR registry
