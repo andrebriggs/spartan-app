@@ -6,13 +6,13 @@ on:
   pull_request:
     branches: [ master ]
 
-env:
+# env:
   # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   # AWS_REGION: us-east-1
-  APP_NAME: spartan-app
-  DOCKER_REPO: andrebriggs
-  DOCKER_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+  # APP_NAME: spartan-app
+  # DOCKER_REPO: andrebriggs
+  # DOCKER_PASSWORD: ${{ secrets.ACR_PASSWORD }}
   # NUGET_PASSWORD: ${{ secrets.PACKAGES_PAT }}
   # NUGET_SOURCE: https://nuget.pkg.github.com/pharos/index.json
   # NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
@@ -59,6 +59,7 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
+        credentials: ${{ secrets.AZURE_CREDENTIALS }}
     
     - name: Azure CLI script
       uses: azure/CLI@v1
