@@ -64,7 +64,7 @@ jobs:
 
         # docker login ${{ secrets.REGISTRY_LOGIN_SERVER }} --username ${{ secrets.REGISTRY_USERNAME }} --password ${{ secrets.REGISTRY_PASSWORD }}
     - run: |
-        docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.APP_NAME }}:${{ github.sha }}
+        docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:${{ github.sha }}
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:${{ github.sha }}
 
     # - uses: actions/checkout@v2
