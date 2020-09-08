@@ -66,6 +66,7 @@ jobs:
         # docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:${{ github.sha }}
     - run: |
         docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:$(date +%s)
+        docker tag ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:$(date +%s) ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:$(date +%s)
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:$(date +%s)
 
     # - uses: actions/checkout@v2
