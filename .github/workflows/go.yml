@@ -55,19 +55,28 @@ jobs:
         go vet .
         golint .
     
-    - name: Login to ACR registry
-      uses: actions-hub/docker/login@master
-      env:
-        DOCKER_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-        DOCKER_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-        DOCKER_REGISTRY_URL: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - run: |
+        echo "az acr build -r andrebriggs --image $GITHUB_REPOSITORY:$(date +%s) ."
+        az acr build -r andrebriggs --image $GITHUB_REPOSITORY:$(date +%s) .
+
+    # - name: Login to ACR registry
+    #   uses: actions-hub/docker/login@master
+    #   env:
+    #     DOCKER_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+    #     DOCKER_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+    #     DOCKER_REGISTRY_URL: ${{ secrets.REGISTRY_LOGIN_SERVER }}
 
         # docker login ${{ secrets.REGISTRY_LOGIN_SERVER }} --username ${{ secrets.REGISTRY_USERNAME }} --password ${{ secrets.REGISTRY_PASSWORD }}
         # docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:${{ github.sha }}
-    - run: |
-        docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:$(date +%s)
-        docker tag ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:$(date +%s) ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:$(date +%s)
-        docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:$(date +%s)
+    # - run: |
+    #     docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:$(date +%s)
+    #     docker tag ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:$(date +%s) ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:$(date +%s)
+    #     docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:$(date +%s)
 
     # - uses: actions/checkout@v2
     # - name: Build the Docker image
