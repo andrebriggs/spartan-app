@@ -6,6 +6,17 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  # AWS_REGION: us-east-1
+  APP_NAME: spartan-app
+  DOCKER_USERNAME: andrebriggs
+  DOCKER_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+  # NUGET_PASSWORD: ${{ secrets.PACKAGES_PAT }}
+  # NUGET_SOURCE: https://nuget.pkg.github.com/pharos/index.json
+  # NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
 jobs:
 
   build:
@@ -44,8 +55,13 @@ jobs:
         go vet .
         golint .
     
+    - name: Login to ACR registry
+      uses: actions-hub/docker/login@master
+      env:
+        DOCKER_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+        DOCKER_REGISTRY_URL: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+
     - uses: actions/checkout@v2
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
-
-
+      run: docker build . --file Dockerfile --tag ${{ env.APP_NAME }}:$(date +%s)
