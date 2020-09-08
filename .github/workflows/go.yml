@@ -11,7 +11,7 @@ env:
   # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   # AWS_REGION: us-east-1
   APP_NAME: spartan-app
-  DOCKER_USERNAME: andrebriggs
+  DOCKER_REPO: andrebriggs
   DOCKER_PASSWORD: ${{ secrets.ACR_PASSWORD }}
   # NUGET_PASSWORD: ${{ secrets.PACKAGES_PAT }}
   # NUGET_SOURCE: https://nuget.pkg.github.com/pharos/index.json
@@ -61,9 +61,11 @@ jobs:
         DOCKER_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
         DOCKER_REGISTRY_URL: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+
+        # docker login ${{ secrets.REGISTRY_LOGIN_SERVER }} --username ${{ secrets.REGISTRY_USERNAME }} --password ${{ secrets.REGISTRY_PASSWORD }}
     - run: |
         docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.APP_NAME }}:${{ github.sha }}
-        docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.APP_NAME }}:${{ github.sha }}
+        docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:${{ github.sha }}
 
     # - uses: actions/checkout@v2
     # - name: Build the Docker image
