@@ -59,10 +59,11 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-        credentials: ${{ secrets.AZURE_CREDENTIALS }}
     
     - name: Azure CLI script
       uses: azure/CLI@v1
+      env: 
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
       with:
         inlineScript: |
           echo "az acr build -r andrebriggs --image $GITHUB_REPOSITORY:$(date +%s) ."
