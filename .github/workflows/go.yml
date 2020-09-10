@@ -1,4 +1,4 @@
-name: Go
+name: Build_Test_Push
 
 on:
   push:
@@ -10,8 +10,11 @@ env:
   # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   # AWS_REGION: us-east-1
-  # APP_NAME: spartan-app
+  APP_NAME: spartan-app
   DOCKER_REPO: andrebriggs
+  INTROSPECTION_ACCOUNT_NAME: abrigspksetup
+  INTROSPECTION_PARTITION_KEY: spektate-key
+  INTROSPECTION_TABLE_NAME: spektatetable
   # DOCKER_PASSWORD: ${{ secrets.ACR_PASSWORD }}
   # NUGET_PASSWORD: ${{ secrets.PACKAGES_PAT }}
   # NUGET_SOURCE: https://nuget.pkg.github.com/pharos/index.json
@@ -60,30 +63,31 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     
-    - name: Azure CLI script
-      uses: azure/CLI@v1
-      env: 
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-      with:
-        inlineScript: |
-          echo "az acr build -r $DOCKER_REPO --image $GITHUB_REPOSITORY:$(date +%s) ."
-          az acr build -r $DOCKER_REPO --image $GITHUB_REPOSITORY:$(date +%s) .
+    - name: Spektate Pre-hook
+      run: |
+        set -e
+        chmod +x ./bedrock_helpers.sh
+        . ./bedrock_helpers.sh --source-only
+        get_bedrock_version
+        download_bedrock
+        export BUILD_REPO_NAME=$(echo $(Build.Repository.Name)-quick-start-app | tr '[:upper:]' '[:lower:]')
+        tag_name="$BUILD_REPO_NAME:$(echo $(Build.SourceBranchName) | tr / - | tr . - | tr _ - )-$(Build.BuildNumber)"
+        tag_name=$GITHUB_REPOSITORY:$GITHUB_RUN_ID
+        commitId=$(Build.SourceVersion)
+        commitId=$(echo "${commitId:0:7}")
+        service=$APP_NAME
+        url=$(git remote --verbose | grep origin | grep fetch | cut -f2 | cut -d' ' -f1)
+        repourl=${url##*@}
+        
+        echo "./bedrock/bedrock deployment create -n $INTROSPECTION_ACCOUNT_NAME -k ${{ secrets.INTROSPECTION_ACCOUNT_KEY }} -t $INTROSPECTION_TABLE_NAME -p $INTROSPECTION_PARTITION_KEY --p1 $GITHUB_RUN_ID --image-tag $tag_name --commit-id $commitId --service $service --repository $repourl"
 
-
-    # - name: Login to ACR registry
-    #   uses: actions-hub/docker/login@master
-    #   env:
-    #     DOCKER_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-    #     DOCKER_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-    #     DOCKER_REGISTRY_URL: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-
-        # docker login ${{ secrets.REGISTRY_LOGIN_SERVER }} --username ${{ secrets.REGISTRY_USERNAME }} --password ${{ secrets.REGISTRY_PASSWORD }}
-        # docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:${{ github.sha }}
-    # - run: |
-    #     docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:$(date +%s)
-    #     docker tag ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:$(date +%s) ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:$(date +%s)
-    #     docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:$(date +%s)
-
-    # - uses: actions/checkout@v2
-    # - name: Build the Docker image
-    #   run: docker build . --file Dockerfile --tag ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.APP_NAME }}:$(date +%s)
+        ./bedrock/bedrock deployment create -n $INTROSPECTION_ACCOUNT_NAME -k ${{ secrets.INTROSPECTION_ACCOUNT_KEY }} -t $INTROSPECTION_TABLE_NAME -p $INTROSPECTION_PARTITION_KEY --p1 $GITHUB_RUN_ID --image-tag $tag_name --commit-id $commitId --service $service --repository $repourl
+  
+    # - name: Azure CLI script
+    #   uses: azure/CLI@v1
+    #   env: 
+    #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+    #   with:
+    #     inlineScript: |
+    #       echo "az acr build -r $DOCKER_REPO --image $GITHUB_REPOSITORY:$(date +%s) ."
+    #       az acr build -r $DOCKER_REPO --image $GITHUB_REPOSITORY:$(date +%s) .
