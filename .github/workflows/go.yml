@@ -15,7 +15,7 @@ env:
   INTROSPECTION_ACCOUNT_NAME: abrigspksetup
   INTROSPECTION_PARTITION_KEY: spektate-key
   INTROSPECTION_TABLE_NAME: spektatetable
-  IMAGE_TAG_NAME: $GITHUB_REPOSITORY:$(date +%s)
+  # IMAGE_TAG_NAME: $GITHUB_REPOSITORY:$(date +%s)
   # DOCKER_PASSWORD: ${{ secrets.ACR_PASSWORD }}
   # NUGET_PASSWORD: ${{ secrets.PACKAGES_PAT }}
   # NUGET_SOURCE: https://nuget.pkg.github.com/pharos/index.json
@@ -29,7 +29,7 @@ jobs:
     steps:
     - name: Debug Env Vars
       run: |
-        echo "IMAGE_TAG_NAME: $IMAGE_TAG_NAME"
+        echo "IMAGE_TAG_NAME: $GITHUB_REPOSITORY:$(date +%s)"
         echo "GITHUB_RUN_ID: $GITHUB_RUN_ID"
         echo "GITHUB_RUN_NUMBER: $GITHUB_RUN_NUMBER"
         echo "GITHUB_ACTOR: $GITHUB_ACTOR"
