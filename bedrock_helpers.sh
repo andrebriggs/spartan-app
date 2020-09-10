@@ -167,3 +167,17 @@ function git_commit_if_changes() {
     echo "commitSuccess=$commitSuccess"
     printf -v $3 "$commitSuccess"
 }
+
+# Perform a Git push
+function git_push() {
+    # Remove http(s):// protocol from URL so we can insert PA token
+    repo_url=$REPO
+    repo_url="${repo_url#http://}"
+    repo_url="${repo_url#https://}"
+
+    echo "GIT PUSH: https://<ACCESS_TOKEN_SECRET>@$repo_url"
+    git push "https://$ACCESS_TOKEN_SECRET@$repo_url"
+    retVal=$? && [ $retVal -ne 0 ] && exit $retVal
+    echo "GIT STATUS"
+    git status
+}
