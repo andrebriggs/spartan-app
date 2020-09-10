@@ -18,3 +18,8 @@ Other secrets to add:
 * __REGISTRY_LOGIN_SERVER__ - (ACRNAME).azurecr.io
 * __REGISTRY_PASSWORD__ - SP Password
 * __REGISTRY_USERNAME__ - SP Client Id
+
+Useful GitHub Actions Links
+
+* [Environment Variables](https://docs.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables)
+* [Workflow Jobs API](https://docs.github.com/en/rest/reference/actions#workflow-jobs)
