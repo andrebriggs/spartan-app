@@ -117,8 +117,11 @@ jobs:
         echo "GITHUB_REF: $GITHUB_REF"
         echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
         echo "GITHUB_EVENT_PATH: $GITHUB_EVENT_PATH"
-    - name: Download Fab, Update HLD, Push changes, Open PR, and if configured, push to Spektate storage
+    
+    - name: Check out code
       uses: actions/checkout@v2
+
+    - name: Download Fab, Update HLD, Push changes, Open PR, and if configured, push to Spektate storage
       run: |
         set -e
         chmod +x ./bedrock_helpers.sh
