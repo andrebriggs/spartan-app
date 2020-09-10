@@ -15,7 +15,6 @@ env:
   INTROSPECTION_ACCOUNT_NAME: abrigspksetup
   INTROSPECTION_PARTITION_KEY: spektate-key
   INTROSPECTION_TABLE_NAME: spektatetable
-  IMAGE_TAG_NAME: $( $GITHUB_REPOSITORY:$(date +%s) )
   # DOCKER_PASSWORD: ${{ secrets.ACR_PASSWORD }}
   # NUGET_PASSWORD: ${{ secrets.PACKAGES_PAT }}
   # NUGET_SOURCE: https://nuget.pkg.github.com/pharos/index.json
@@ -27,9 +26,15 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
+    - name: Set current date as env variable
+      run: |
+        echo "::set-env name=NOW::$(date +'%Y%m%d')"
+        echo "::set-env name=IMAGE_TAG_NAME::$GITHUB_REPOSITORY:$NOW.$GITHUB_RUN_NUMBER
+
     - name: Debug Env Vars
       run: |
         echo "IMAGE_TAG_NAME: $IMAGE_TAG_NAME"
+        echo "Concat IMAGE_TAG_NAME: $GITHUB_REPOSITORY:$NOW.$GITHUB_RUN_NUMBER"
         echo "GITHUB_RUN_ID: $GITHUB_RUN_ID"
         echo "GITHUB_RUN_NUMBER: $GITHUB_RUN_NUMBER"
         echo "GITHUB_ACTOR: $GITHUB_ACTOR"
@@ -81,7 +86,7 @@ jobs:
         . ./bedrock_helpers.sh --source-only
         get_bedrock_version
         download_bedrock
-        tag_name=$GITHUB_REPOSITORY:$GITHUB_RUN_ID
+        tag_name=$GITHUB_REPOSITORY:$NOW.$GITHUB_RUN_NUMBER
         commitId=$GITHUB_SHA
         commitId=$(echo "${commitId:0:7}")
         service=$APP_NAME
@@ -98,5 +103,5 @@ jobs:
     #     creds: ${{ secrets.AZURE_CREDENTIALS }}
     #   with:
     #     inlineScript: |
-    #       echo "az acr build -r $DOCKER_REPO --image $GITHUB_REPOSITORY:$(date +%s) ."
-    #       az acr build -r $DOCKER_REPO --image $GITHUB_REPOSITORY:$(date +%s) .
+    #       echo "az acr build -r $DOCKER_REPO --image $GITHUB_REPOSITORY:$NOW.$GITHUB_RUN_NUMBER ."
+    #       az acr build -r $DOCKER_REPO --image $GITHUB_REPOSITORY:$NOW.$GITHUB_RUN_NUMBER .
