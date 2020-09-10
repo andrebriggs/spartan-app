@@ -121,6 +121,11 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v2
 
+    - uses: azure/setup-helm@v1
+      with:
+        version: v2.16.3
+      id: install
+
     - name: Download Fab, Update HLD, Push changes, Open PR, and if configured, push to Spektate storage
       run: |
         set -e
