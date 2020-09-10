@@ -16,6 +16,7 @@ env:
   INTROSPECTION_ACCOUNT_NAME: abrigspksetup
   INTROSPECTION_PARTITION_KEY: spektate-key
   INTROSPECTION_TABLE_NAME: spektatetable
+  FAB_SERVICE_NAME: spartan-service
 
 jobs:
 
@@ -156,21 +157,20 @@ jobs:
         export IMAGE_TAG=$(echo $(date +'%Y%m%d').$GITHUB_RUN_NUMBER)
         echo "Image Tag: $IMAGE_TAG"
 
-        export IMAGE_REPO=$(echo $(DOCKER_REPO).azurecr.io | tr '[:upper:]' '[:lower:]')
+        export IMAGE_REPO=$(echo $DOCKER_REPO.azurecr.io/$GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]')
         echo "Image Repository: $IMAGE_REPO"
         ls -la
 
-# cd $(Build.Repository.Name)/$FAB_SAFE_SERVICE_NAME/$(echo $(Build.SourceBranchName) | tr / - | tr . - | tr _ - )
-# echo "FAB SET"
-# fab set --subcomponent chart image.tag=$IMAGE_TAG image.repository=$$GITHUB_REPOSITORY
+        echo "FAB SET"
+        fab set --subcomponent $FAB_SERVICE_NAME image.tag=$IMAGE_TAG image.repository=$IMAGE_REPO
 
-# # Set git identity
-# git config user.email "admin@azuredevops.com"
-# git config user.name "Automated Account"
+        # Set git identity
+        git config user.email "admin@azuredevops.com"
+        git config user.name "Automated Account"
 
-# # Commit changes
-# echo "GIT ADD and COMMIT -- Will throw error if there is nothing to commit."
-# git_commit_if_changes "Updating $SERVICE_NAME_LOWER image tag to $(echo $(Build.SourceBranchName) | tr / - | tr . - | tr _ - )-$(Build.BuildNumber)." 1 unusedVar
+        # Commit changes
+        echo "GIT ADD and COMMIT -- Will throw error if there is nothing to commit."
+        git_commit_if_changes "Updating $SERVICE_NAME_LOWER image tag to $(echo $(Build.SourceBranchName) | tr / - | tr . - | tr _ - )-$(Build.BuildNumber)." 1 unusedVar
 
 # # Git Push
 # git_push
