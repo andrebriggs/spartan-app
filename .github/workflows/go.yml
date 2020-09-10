@@ -118,6 +118,11 @@ jobs:
         echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
         echo "GITHUB_EVENT_PATH: $GITHUB_EVENT_PATH"
     
+    - name: Set current date as env variable  
+      run: |
+        echo "::set-env name=NOW::$(date +'%Y%m%d')"
+        echo "::set-env name=BRANCH_NAME::DEPLOY/$APP_NAME-$(date +'%Y%m%d').$GITHUB_RUN_NUMBER"
+
     - name: Check out code
       uses: actions/checkout@v2
 
@@ -144,3 +149,28 @@ jobs:
         # Clone HLD repo
         git_connect
         # --- End Script
+
+        # Update HLD
+        git checkout -b "$BRANCH_NAME"
+
+        export IMAGE_TAG=$(echo $(date +'%Y%m%d').$GITHUB_RUN_NUMBER)
+        echo "Image Tag: $IMAGE_TAG"
+
+        export IMAGE_REPO=$(echo $(DOCKER_REPO).azurecr.io | tr '[:upper:]' '[:lower:]')
+        echo "Image Repository: $IMAGE_REPO"
+        ls -la
+
+# cd $(Build.Repository.Name)/$FAB_SAFE_SERVICE_NAME/$(echo $(Build.SourceBranchName) | tr / - | tr . - | tr _ - )
+# echo "FAB SET"
+# fab set --subcomponent chart image.tag=$IMAGE_TAG image.repository=$$GITHUB_REPOSITORY
+
+# # Set git identity
+# git config user.email "admin@azuredevops.com"
+# git config user.name "Automated Account"
+
+# # Commit changes
+# echo "GIT ADD and COMMIT -- Will throw error if there is nothing to commit."
+# git_commit_if_changes "Updating $SERVICE_NAME_LOWER image tag to $(echo $(Build.SourceBranchName) | tr / - | tr . - | tr _ - )-$(Build.BuildNumber)." 1 unusedVar
+
+# # Git Push
+# git_push
