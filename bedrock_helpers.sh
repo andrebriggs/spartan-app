@@ -1,3 +1,17 @@
+# Obtain version for Bedrock CLI
+# If the version number is not provided, then download the latest
+function get_bedrock_version() {
+    # shellcheck disable=SC2153
+    if [ -z "$VERSION" ]
+    then
+        # By default, the script will use the most recent non-prerelease, non-draft release Bedrock CLI
+        CLI_VERSION_TO_DOWNLOAD=$(curl -s "https://api.github.com/repos/microsoft/bedrock-cli/releases/latest" | grep "tag_name" | sed -E 's/.*"([^"]+)".*/\1/')
+    else
+        echo "Bedrock CLI Version: $VERSION"
+        CLI_VERSION_TO_DOWNLOAD=$VERSION
+    fi
+}
+
 # Obtain OS to download the appropriate version of Bedrock CLI
 function get_os_bedrock() {
     if [[ "$OSTYPE" == "linux-gnu" ]]; then
