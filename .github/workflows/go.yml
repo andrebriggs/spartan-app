@@ -15,6 +15,7 @@ env:
   INTROSPECTION_ACCOUNT_NAME: abrigspksetup
   INTROSPECTION_PARTITION_KEY: spektate-key
   INTROSPECTION_TABLE_NAME: spektatetable
+  IMAGE_TAG_NAME: $GITHUB_REPOSITORY:$(date +%s)
   # DOCKER_PASSWORD: ${{ secrets.ACR_PASSWORD }}
   # NUGET_PASSWORD: ${{ secrets.PACKAGES_PAT }}
   # NUGET_SOURCE: https://nuget.pkg.github.com/pharos/index.json
@@ -28,6 +29,7 @@ jobs:
     steps:
     - name: Debug Env Vars
       run: |
+        echo "IMAGE_TAG_NAME: $IMAGE_TAG_NAME"
         echo "GITHUB_RUN_ID: $GITHUB_RUN_ID"
         echo "GITHUB_RUN_NUMBER: $GITHUB_RUN_NUMBER"
         echo "GITHUB_ACTOR: $GITHUB_ACTOR"
@@ -72,7 +74,7 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     
-    - name: Spektate Pre-hook
+    - name: Update Spektate storage
       run: |
         set -e
         chmod +x ./bedrock_helpers.sh
