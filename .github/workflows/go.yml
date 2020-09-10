@@ -7,18 +7,12 @@ on:
     branches: [ master ]
 
 env:
-  # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  # AWS_REGION: us-east-1
+  INTROSPECTION_ACCOUNT_KEY: ${{ secrets.INTROSPECTION_ACCOUNT_KEY }}
   APP_NAME: spartan-app
   DOCKER_REPO: andrebriggs
   INTROSPECTION_ACCOUNT_NAME: abrigspksetup
   INTROSPECTION_PARTITION_KEY: spektate-key
   INTROSPECTION_TABLE_NAME: spektatetable
-  # DOCKER_PASSWORD: ${{ secrets.ACR_PASSWORD }}
-  # NUGET_PASSWORD: ${{ secrets.PACKAGES_PAT }}
-  # NUGET_SOURCE: https://nuget.pkg.github.com/pharos/index.json
-  # NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
 
 jobs:
 
@@ -86,16 +80,15 @@ jobs:
         . ./bedrock_helpers.sh --source-only
         get_bedrock_version
         download_bedrock
-        tag_name=$GITHUB_REPOSITORY:$NOW.$GITHUB_RUN_NUMBER
+
         commitId=$GITHUB_SHA
         commitId=$(echo "${commitId:0:7}")
-        service=$APP_NAME
         url=$(git remote --verbose | grep origin | grep fetch | cut -f2 | cut -d' ' -f1)
         repourl=${url##*@}
         
-        echo "./bedrock/bedrock deployment create -n $INTROSPECTION_ACCOUNT_NAME -k ${{ secrets.INTROSPECTION_ACCOUNT_KEY }} -t $INTROSPECTION_TABLE_NAME -p $INTROSPECTION_PARTITION_KEY --p1 $GITHUB_RUN_ID --image-tag $tag_name --commit-id $commitId --service $service --repository $repourl"
+        echo "./bedrock/bedrock deployment create -n $INTROSPECTION_ACCOUNT_NAME -k $INTROSPECTION_ACCOUNT_KEY -t $INTROSPECTION_TABLE_NAME -p $INTROSPECTION_PARTITION_KEY --p1 $GITHUB_RUN_ID --image-tag $IMAGE_TAG_NAME --commit-id $commitId --service $APP_NAME --repository $repourl"
 
-        ./bedrock/bedrock deployment create -n $INTROSPECTION_ACCOUNT_NAME -k ${{ secrets.INTROSPECTION_ACCOUNT_KEY }} -t $INTROSPECTION_TABLE_NAME -p $INTROSPECTION_PARTITION_KEY --p1 $GITHUB_RUN_ID --image-tag $tag_name --commit-id $commitId --service $service --repository $repourl
+        ./bedrock/bedrock deployment create -n $INTROSPECTION_ACCOUNT_NAME -k $INTROSPECTION_ACCOUNT_KEY -t $INTROSPECTION_TABLE_NAME -p $INTROSPECTION_PARTITION_KEY --p1 $GITHUB_RUN_ID --image-tag $IMAGE_TAG_NAME --commit-id $commitId --service $APP_NAME --repository $repourl
   
     # - name: Azure CLI script
     #   uses: azure/CLI@v1
@@ -103,5 +96,5 @@ jobs:
     #     creds: ${{ secrets.AZURE_CREDENTIALS }}
     #   with:
     #     inlineScript: |
-    #       echo "az acr build -r $DOCKER_REPO --image $GITHUB_REPOSITORY:$NOW.$GITHUB_RUN_NUMBER ."
-    #       az acr build -r $DOCKER_REPO --image $GITHUB_REPOSITORY:$NOW.$GITHUB_RUN_NUMBER .
+    #       echo "az acr build -r $DOCKER_REPO --image $IMAGE_TAG_NAME ."
+    #       az acr build -r $DOCKER_REPO --image $IMAGE_TAG_NAME .
