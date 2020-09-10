@@ -88,14 +88,14 @@ jobs:
     #     GITHUB_TOKEN: $ACCESS_TOKEN_SECRET  
     # - run: "echo latest release: ${{ steps.get_jobs.outputs.data }}"
 
-    - name: Get Check Run Id
+    - name: Get and Set Job Run Id
       run: |
-        result=$(curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs)
-        echo $result
-        job_name=Build
-        job_run_id=$(echo "$result"  | jq -r --arg job_name "$job_name" '.jobs[] | select(.name == $job_name) | .id')
+        result=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs)
+        job_run_id=$(echo "$result"  | jq -r --arg job_name "$JOB_NAME" '.jobs[] | select(.name == $JOB_NAME) | .id')
         echo "job_run_id: $job_run_id"
         echo "::set-env name=JOB_RUN_ID::$job_run_id"
+      env:
+        JOB_NAME: Build
 
     - name: Update Spektate storage
       run: |
@@ -110,8 +110,8 @@ jobs:
         url=$(git remote --verbose | grep origin | grep fetch | cut -f2 | cut -d' ' -f1)
         repourl=${url##*@}
         
-        echo "./bedrock/bedrock deployment create -n $INTROSPECTION_ACCOUNT_NAME -k $INTROSPECTION_ACCOUNT_KEY -t $INTROSPECTION_TABLE_NAME -p $INTROSPECTION_PARTITION_KEY --p1 $GITHUB_RUN_ID --image-tag $IMAGE_TAG_NAME --commit-id $commitId --service $APP_NAME --repository $repourl"
-        ./bedrock/bedrock deployment create -n $INTROSPECTION_ACCOUNT_NAME -k $INTROSPECTION_ACCOUNT_KEY -t $INTROSPECTION_TABLE_NAME -p $INTROSPECTION_PARTITION_KEY --p1 $GITHUB_RUN_ID --image-tag $IMAGE_TAG_NAME --commit-id $commitId --service $APP_NAME --repository $repourl
+        echo "./bedrock/bedrock deployment create -n $INTROSPECTION_ACCOUNT_NAME -k $INTROSPECTION_ACCOUNT_KEY -t $INTROSPECTION_TABLE_NAME -p $INTROSPECTION_PARTITION_KEY --p1 $JOB_RUN_ID --image-tag $IMAGE_TAG_NAME --commit-id $commitId --service $APP_NAME --repository $repourl"
+        ./bedrock/bedrock deployment create -n $INTROSPECTION_ACCOUNT_NAME -k $INTROSPECTION_ACCOUNT_KEY -t $INTROSPECTION_TABLE_NAME -p $INTROSPECTION_PARTITION_KEY --p1 $JOB_RUN_ID --image-tag $IMAGE_TAG_NAME --commit-id $commitId --service $APP_NAME --repository $repourl
   
     # - name: Azure CLI script
     #   uses: azure/CLI@v1
@@ -132,6 +132,15 @@ jobs:
         echo "::set-env name=NOW::$(date +'%Y%m%d')"
         echo "::set-env name=IMAGE_TAG_NAME::$GITHUB_REPOSITORY:$(date +'%Y%m%d').$GITHUB_RUN_NUMBER"
         echo "::set-env name=BRANCH_NAME::DEPLOY/$APP_NAME-$(date +'%Y%m%d').$GITHUB_RUN_NUMBER"
+
+    - name: Get and Set Job Run Id
+      run: |
+        result=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs)
+        job_run_id=$(echo "$result"  | jq -r --arg job_name "$JOB_NAME" '.jobs[] | select(.name == $JOB_NAME) | .id')
+        echo "job_run_id: $job_run_id"
+        echo "::set-env name=JOB_RUN_ID::$job_run_id"
+      env:
+        JOB_NAME: HLD Update
 
     - name: Debug Env Vars
       run: |
@@ -218,5 +227,5 @@ jobs:
         branchName="${GITHUB_REF##*/}"
         get_bedrock_version
         download_bedrock
-        ./bedrock/bedrock deployment create  -n $INTROSPECTION_ACCOUNT_NAME -k $INTROSPECTION_ACCOUNT_KEY -t $INTROSPECTION_TABLE_NAME -p $INTROSPECTION_PARTITION_KEY --p2 $GITHUB_RUN_ID --hld-commit-id $latest_commit --env $branchName --image-tag $IMAGE_TAG_NAME --pr $pr_id --repository $repourl
+        ./bedrock/bedrock deployment create  -n $INTROSPECTION_ACCOUNT_NAME -k $INTROSPECTION_ACCOUNT_KEY -t $INTROSPECTION_TABLE_NAME -p $INTROSPECTION_PARTITION_KEY --p2 $JOB_RUN_ID --hld-commit-id $latest_commit --env $branchName --image-tag $IMAGE_TAG_NAME --pr $pr_id --repository $repourl
         fi
