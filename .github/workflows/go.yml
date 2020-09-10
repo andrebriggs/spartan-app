@@ -99,6 +99,7 @@ jobs:
           az acr build -r $DOCKER_REPO --image $IMAGE_TAG_NAME .
   hld_update:
     name: HLD Update
+    needs: build
     runs-on: ubuntu-latest
     steps:
     - name: Debug Env Vars
