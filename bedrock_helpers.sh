@@ -125,3 +125,16 @@ function git_connect() {
     echo "GIT PULL ORIGIN MASTER"
     git pull origin master
 }
+
+# Obtain OS to download the appropriate version of Fabrikate
+function get_os() {
+    if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        eval "$1='linux'"
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        eval "$1='darwin'"
+    elif [[ "$OSTYPE" == "msys" ]]; then
+        eval "$1='windows'"
+    else
+        eval "$1='linux'"
+    fi
+}
