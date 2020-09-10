@@ -170,7 +170,17 @@ jobs:
 
         # Commit changes
         echo "GIT ADD and COMMIT -- Will throw error if there is nothing to commit."
-        git_commit_if_changes "Updating $SERVICE_NAME_LOWER image tag to $(echo $(Build.SourceBranchName) | tr / - | tr . - | tr _ - )-$(Build.BuildNumber)." 1 unusedVar
+        git_commit_if_changes "Updating $FAB_SERVICE_NAME image tag to $IMAGE_TAG." 1 unusedVar
 
-# # Git Push
-# git_push
+        # Git Push
+        git_push
+
+        cd ..
+        wget https://github.com/github/hub/releases/download/v2.12.3/hub-linux-amd64-2.12.3.tgz
+        tar -xvf hub-linux-amd64-2.12.3.tgz
+        
+        # hardcoded
+        cd fabrikate-spartan-cluster 
+        echo "Attempting to PR"
+        export GITHUB_TOKEN=$ACCESS_TOKEN_SECRET
+        ../hub-linux-amd64-2.12.3/bin/hub pull-request -p -m "Automated PR for $GITHUB_REPOSITORY"
