@@ -91,12 +91,12 @@ jobs:
     - name: Get and Set Job Run Id
       run: |
         result=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs)
-        JOB_NAME=$(JOB_NAME)
+        JOB_NAME=Build
         job_run_id=$(echo "$result"  | jq -r --arg job_name "$JOB_NAME" '.jobs[] | select(.name == $JOB_NAME) | .id')
         echo "job_run_id: $job_run_id"
         echo "::set-env name=JOB_RUN_ID::$job_run_id"
-      env:
-        JOB_NAME: Build
+      # env:
+      #   JOB_NAME: Build
 
     - name: Update Spektate storage
       run: |
