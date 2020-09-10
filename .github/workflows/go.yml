@@ -77,6 +77,17 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     
+    - name: Get Run Id
+      uses: octokit/request-action@v2.x
+      id: get_jobs
+      with:
+        route: GET /repos/:repository/actions/runs/:run_id}/jobs
+        repository: ${{ github.repository }}
+        run_id: $GITHUB_RUN_ID
+      env:
+        GITHUB_TOKEN: $ACCESS_TOKEN_SECRET  
+    - run: "echo latest release: ${{ steps.get_jobs.outputs.data }}"
+
     - name: Update Spektate storage
       run: |
         set -e
