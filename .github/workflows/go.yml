@@ -70,10 +70,8 @@ jobs:
         . ./bedrock_helpers.sh --source-only
         get_bedrock_version
         download_bedrock
-        export BUILD_REPO_NAME=$(echo $(Build.Repository.Name)-quick-start-app | tr '[:upper:]' '[:lower:]')
-        tag_name="$BUILD_REPO_NAME:$(echo $(Build.SourceBranchName) | tr / - | tr . - | tr _ - )-$(Build.BuildNumber)"
         tag_name=$GITHUB_REPOSITORY:$GITHUB_RUN_ID
-        commitId=$(Build.SourceVersion)
+        commitId=$GITHUB_SHA
         commitId=$(echo "${commitId:0:7}")
         service=$APP_NAME
         url=$(git remote --verbose | grep origin | grep fetch | cut -f2 | cut -d' ' -f1)
