@@ -77,16 +77,24 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     
-    - name: Get Run Id
-      uses: octokit/request-action@v2.x
-      id: get_jobs
-      with:
-        route: GET /repos/:repository/actions/runs/:run_id}/jobs
-        repository: ${{ github.repository }}
-        run_id: $GITHUB_RUN_ID
-      env:
-        GITHUB_TOKEN: $ACCESS_TOKEN_SECRET  
-    - run: "echo latest release: ${{ steps.get_jobs.outputs.data }}"
+    # - name: Get Run Id
+    #   uses: octokit/request-action@v2.x
+    #   id: get_jobs
+    #   with:
+    #     route: GET /repos/:repository/actions/runs/:run_id/jobs
+    #     repository: ${{ github.repository }}
+    #     run_id: $GITHUB_RUN_ID
+    #   env:
+    #     GITHUB_TOKEN: $ACCESS_TOKEN_SECRET  
+    # - run: "echo latest release: ${{ steps.get_jobs.outputs.data }}"
+
+    - name: Get Check Run Id
+      run: |
+        result=$(curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs)
+        job_name=Build
+        job_run_id=$(echo "$result"  | jq -r --arg job_name "$job_name" '.[] | select(.name == $job_name) | .id')
+        echo "job_run_id: $job_run_id"
+        echo "::set-env name=JOB_RUN_ID::$job_run_id"
 
     - name: Update Spektate storage
       run: |
