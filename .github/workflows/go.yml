@@ -8,6 +8,9 @@ on:
 
 env:
   INTROSPECTION_ACCOUNT_KEY: ${{ secrets.INTROSPECTION_ACCOUNT_KEY }}
+  # REPO: ${{ secrets.INTROSPECTION_ACCOUNT_KEY }}
+  ACCESS_TOKEN_SECRET: ${{ secrets.HLD_REPO_SECRET }}
+  REPO: https://github.com/andrebriggs/fabrikate-spartan-cluster
   APP_NAME: spartan-app
   DOCKER_REPO: andrebriggs
   INTROSPECTION_ACCOUNT_NAME: abrigspksetup
@@ -89,14 +92,15 @@ jobs:
         echo "./bedrock/bedrock deployment create -n $INTROSPECTION_ACCOUNT_NAME -k $INTROSPECTION_ACCOUNT_KEY -t $INTROSPECTION_TABLE_NAME -p $INTROSPECTION_PARTITION_KEY --p1 $GITHUB_RUN_ID --image-tag $IMAGE_TAG_NAME --commit-id $commitId --service $APP_NAME --repository $repourl"
         ./bedrock/bedrock deployment create -n $INTROSPECTION_ACCOUNT_NAME -k $INTROSPECTION_ACCOUNT_KEY -t $INTROSPECTION_TABLE_NAME -p $INTROSPECTION_PARTITION_KEY --p1 $GITHUB_RUN_ID --image-tag $IMAGE_TAG_NAME --commit-id $commitId --service $APP_NAME --repository $repourl
   
-    - name: Azure CLI script
-      uses: azure/CLI@v1
-      env: 
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-      with:
-        inlineScript: |
-          echo "az acr build -r $DOCKER_REPO --image $IMAGE_TAG_NAME ."
-          az acr build -r $DOCKER_REPO --image $IMAGE_TAG_NAME .
+    # - name: Azure CLI script
+    #   uses: azure/CLI@v1
+    #   env: 
+    #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+    #   with:
+    #     inlineScript: |
+    #       echo "az acr build -r $DOCKER_REPO --image $IMAGE_TAG_NAME ."
+    #       az acr build -r $DOCKER_REPO --image $IMAGE_TAG_NAME .
+
   hld_update:
     name: HLD Update
     needs: build
@@ -113,3 +117,21 @@ jobs:
         echo "GITHUB_REF: $GITHUB_REF"
         echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
         echo "GITHUB_EVENT_PATH: $GITHUB_EVENT_PATH"
+    - name: Download Fab, Update HLD, Push changes, Open PR, and if configured, push to Spektate storage
+      run: |
+        set -e
+        chmod +x ./bedrock_helpers.sh
+        . ./bedrock_helpers.sh --source-only
+
+        # Initialization
+        verify_access_token
+        init
+        helm_init
+
+        # Fabrikate
+        get_fab_version
+        download_fab
+
+        # Clone HLD repo
+        git_connect
+        # --- End Script
