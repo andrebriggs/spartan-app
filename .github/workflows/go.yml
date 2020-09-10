@@ -15,7 +15,7 @@ env:
   INTROSPECTION_ACCOUNT_NAME: abrigspksetup
   INTROSPECTION_PARTITION_KEY: spektate-key
   INTROSPECTION_TABLE_NAME: spektatetable
-  IMAGE_TAG_NAME: ${{ env.GITHUB_REPOSITORY:$(date +%s) }}
+  IMAGE_TAG_NAME: ${{ $GITHUB_REPOSITORY:$(date +%s) }}
   # DOCKER_PASSWORD: ${{ secrets.ACR_PASSWORD }}
   # NUGET_PASSWORD: ${{ secrets.PACKAGES_PAT }}
   # NUGET_SOURCE: https://nuget.pkg.github.com/pharos/index.json
