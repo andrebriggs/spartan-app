@@ -1,4 +1,4 @@
-FROM golang:1.11
+FROM golang:1.15
 COPY . /go/src/github.com/andrebriggs/spartan-app
 WORKDIR /go/src/github.com/andrebriggs/spartan-app/
 RUN go get -v -t -d ./...

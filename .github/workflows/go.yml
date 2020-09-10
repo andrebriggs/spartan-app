@@ -88,6 +88,7 @@ jobs:
     #     GITHUB_TOKEN: $ACCESS_TOKEN_SECRET  
     # - run: "echo latest release: ${{ steps.get_jobs.outputs.data }}"
 
+    # hard coding jobname
     - name: Get and Set Job Run Id
       run: |
         result=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs)
@@ -114,14 +115,14 @@ jobs:
         echo "./bedrock/bedrock deployment create -n $INTROSPECTION_ACCOUNT_NAME -k $INTROSPECTION_ACCOUNT_KEY -t $INTROSPECTION_TABLE_NAME -p $INTROSPECTION_PARTITION_KEY --p1 $JOB_RUN_ID --image-tag $IMAGE_TAG_NAME --commit-id $commitId --service $APP_NAME --repository $repourl"
         ./bedrock/bedrock deployment create -n $INTROSPECTION_ACCOUNT_NAME -k $INTROSPECTION_ACCOUNT_KEY -t $INTROSPECTION_TABLE_NAME -p $INTROSPECTION_PARTITION_KEY --p1 $JOB_RUN_ID --image-tag $IMAGE_TAG_NAME --commit-id $commitId --service $APP_NAME --repository $repourl
   
-    # - name: Azure CLI script
-    #   uses: azure/CLI@v1
-    #   env: 
-    #     creds: ${{ secrets.AZURE_CREDENTIALS }}
-    #   with:
-    #     inlineScript: |
-    #       echo "az acr build -r $DOCKER_REPO --image $IMAGE_TAG_NAME ."
-    #       az acr build -r $DOCKER_REPO --image $IMAGE_TAG_NAME .
+    - name: Azure CLI script
+      uses: azure/CLI@v1
+      env: 
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      with:
+        inlineScript: |
+          echo "az acr build -r $DOCKER_REPO --image $IMAGE_TAG_NAME ."
+          az acr build -r $DOCKER_REPO --image $IMAGE_TAG_NAME .
 
   hld_update:
     name: HLD Update
@@ -134,6 +135,7 @@ jobs:
         echo "::set-env name=IMAGE_TAG_NAME::$GITHUB_REPOSITORY:$(date +'%Y%m%d').$GITHUB_RUN_NUMBER"
         echo "::set-env name=BRANCH_NAME::DEPLOY/$APP_NAME-$(date +'%Y%m%d').$GITHUB_RUN_NUMBER"
 
+    # hard coding jobname
     - name: Get and Set Job Run Id
       run: |
         result=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs)
