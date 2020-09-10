@@ -91,8 +91,9 @@ jobs:
     - name: Get Check Run Id
       run: |
         result=$(curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs)
+        echo $result
         job_name=Build
-        job_run_id=$(echo "$result"  | jq -r --arg job_name "$job_name" '.[] | select(.name == $job_name) | .id')
+        job_run_id=$(echo "$result"  | jq -r --arg job_name "$job_name" '.jobs[] | select(.name == $job_name) | .id')
         echo "job_run_id: $job_run_id"
         echo "::set-env name=JOB_RUN_ID::$job_run_id"
 
