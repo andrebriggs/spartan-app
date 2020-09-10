@@ -87,14 +87,28 @@ jobs:
         repourl=${url##*@}
         
         echo "./bedrock/bedrock deployment create -n $INTROSPECTION_ACCOUNT_NAME -k $INTROSPECTION_ACCOUNT_KEY -t $INTROSPECTION_TABLE_NAME -p $INTROSPECTION_PARTITION_KEY --p1 $GITHUB_RUN_ID --image-tag $IMAGE_TAG_NAME --commit-id $commitId --service $APP_NAME --repository $repourl"
-
         ./bedrock/bedrock deployment create -n $INTROSPECTION_ACCOUNT_NAME -k $INTROSPECTION_ACCOUNT_KEY -t $INTROSPECTION_TABLE_NAME -p $INTROSPECTION_PARTITION_KEY --p1 $GITHUB_RUN_ID --image-tag $IMAGE_TAG_NAME --commit-id $commitId --service $APP_NAME --repository $repourl
   
-    # - name: Azure CLI script
-    #   uses: azure/CLI@v1
-    #   env: 
-    #     creds: ${{ secrets.AZURE_CREDENTIALS }}
-    #   with:
-    #     inlineScript: |
-    #       echo "az acr build -r $DOCKER_REPO --image $IMAGE_TAG_NAME ."
-    #       az acr build -r $DOCKER_REPO --image $IMAGE_TAG_NAME .
+    - name: Azure CLI script
+      uses: azure/CLI@v1
+      env: 
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      with:
+        inlineScript: |
+          echo "az acr build -r $DOCKER_REPO --image $IMAGE_TAG_NAME ."
+          az acr build -r $DOCKER_REPO --image $IMAGE_TAG_NAME .
+  hld_update:
+    name: HLD Update
+    runs-on: ubuntu-latest
+    steps:
+    - name: Debug Env Vars
+      run: |
+        echo "IMAGE_TAG_NAME: $IMAGE_TAG_NAME"
+        echo "Concat IMAGE_TAG_NAME: $GITHUB_REPOSITORY:$NOW.$GITHUB_RUN_NUMBER"
+        echo "GITHUB_RUN_ID: $GITHUB_RUN_ID"
+        echo "GITHUB_RUN_NUMBER: $GITHUB_RUN_NUMBER"
+        echo "GITHUB_ACTOR: $GITHUB_ACTOR"
+        echo "GITHUB_WORKFLOW: $GITHUB_WORKFLOW"
+        echo "GITHUB_REF: $GITHUB_REF"
+        echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
+        echo "GITHUB_EVENT_PATH: $GITHUB_EVENT_PATH"
