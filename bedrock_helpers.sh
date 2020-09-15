@@ -175,6 +175,9 @@ function git_push() {
     repo_url="${repo_url#http://}"
     repo_url="${repo_url#https://}"
 
+    # Git Pull to make sure we are up to date
+    git pull "https://$ACCESS_TOKEN_SECRET@$repo_url"
+        
     echo "GIT PUSH: https://<ACCESS_TOKEN_SECRET>@$repo_url"
     git push "https://$ACCESS_TOKEN_SECRET@$repo_url"
     retVal=$? && [ $retVal -ne 0 ] && exit $retVal

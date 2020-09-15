@@ -209,9 +209,6 @@ jobs:
         echo "GIT ADD and COMMIT -- Will throw error if there is nothing to commit."
         git_commit_if_changes "Updating $FAB_SERVICE_NAME image tag to $IMAGE_TAG." 1 unusedVar
         
-        # Git Pull to make sure we are up to date
-        git pull
-        
         # Git Push
         git_push
 
